@@ -1,1 +1,271 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تطبيق الويب - الرصيد المشترك</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--tg-theme-bg-color, #f0f2f5);
+            color: var(--tg-theme-text-color, #333);
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        .header { text-align: center; padding: 20px 0; }
+        .header .icon { font-size: 48px; display: block; margin-bottom: 12px; }
+        .header h1 { font-size: 22px; margin-bottom: 4px; }
+        .header p { color: var(--tg-theme-hint-color, #999); font-size: 14px; }
+        .card {
+            background-color: var(--tg-theme-secondary-bg-color, #fff);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h3 { font-size: 16px; margin-bottom: 12px; }
+        .balance-display { text-align: center; padding: 16px; }
+        .balance-amount { font-size: 36px; font-weight: bold; color: #0088cc; margin: 8px 0; }
+        .balance-label { font-size: 14px; color: var(--tg-theme-hint-color, #999); }
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; font-size: 13px; color: var(--tg-theme-hint-color, #999); margin-bottom: 4px; }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--tg-theme-hint-color, #ddd);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            background-color: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #333);
+        }
+        .input-group textarea { resize: vertical; min-height: 70px; }
+        .buttons { display: flex; flex-direction: column; gap: 10px; }
+        button {
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        button:active { transform: scale(0.97); opacity: 0.8; }
+        button.secondary { background-color: var(--tg-theme-secondary-bg-color, #e0e0e0); color: var(--tg-theme-text-color, #333); }
+        button.success { background-color: #28a745; }
+        button.danger { background-color: #dc3545; }
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .service-item {
+            background-color: var(--tg-theme-bg-color, #f8f9fa);
+            border: 1px solid var(--tg-theme-hint-color, #ddd);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .service-item:active { transform: scale(0.95); }
+        .service-item .emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+        .service-item .name { font-size: 13px; font-weight: 500; }
+        .service-item .price { font-size: 12px; color: var(--tg-theme-hint-color, #999); margin-top: 4px; }
+        .transactions-list { max-height: 200px; overflow-y: auto; }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #eee);
+        }
+        .transaction-item:last-child { border-bottom: none; }
+        .transaction-amount { font-weight: bold; }
+        .transaction-amount.positive { color: #28a745; }
+        .transaction-amount.negative { color: #dc3545; }
+        .transaction-desc { font-size: 13px; color: var(--tg-theme-hint-color, #999); }
+        .char-count { text-align: left; font-size: 11px; color: var(--tg-theme-hint-color, #999); margin-top: 2px; }
+        #status { margin-top: 12px; padding: 12px; border-radius: 8px; font-size: 14px; text-align: center; display: none; }
+        #status.success { display: block; background-color: #d4edda; color: #155724; }
+        #status.error { display: block; background-color: #f8d7da; color: #721c24; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--tg-theme-secondary-bg-color, #fff);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-content h3 { margin-bottom: 12px; }
+        .modal-content p { margin-bottom: 20px; color: var(--tg-theme-hint-color, #666); }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="icon">💰</span>
+            <h1>تطبيق الويب</h1>
+            <p>الرصيد مشترك مع البوت</p>
+        </div>
+        <div class="card">
+            <div class="balance-display">
+                <span class="balance-label">💰 رصيدك الحالي</span>
+                <div class="balance-amount" id="balanceAmount">0.00</div>
+                <span class="balance-label" id="userNameDisplay">---</span>
+            </div>
+            <button class="secondary" onclick="refreshBalance()" style="width:100%;margin-top:8px;">🔄 تحديث الرصيد</button>
+        </div>
+        <div class="card">
+            <h3>🛒 الخدمات (تخصم من رصيدك)</h3>
+            <div class="services-grid">
+                <div class="service-item" onclick="purchaseService('استشارة سريعة', 10)">
+                    <span class="emoji">📋</span><span class="name">استشارة سريعة</span><span class="price">10.00</span>
+                </div>
+                <div class="service-item" onclick="purchaseService('حجز موعد', 20)">
+                    <span class="emoji">📅</span><span class="name">حجز موعد</span><span class="price">20.00</span>
+                </div>
+                <div class="service-item" onclick="purchaseService('تقرير مفصل', 50)">
+                    <span class="emoji">📊</span><span class="name">تقرير مفصل</span><span class="price">50.00</span>
+                </div>
+                <div class="service-item" onclick="purchaseService('باقة مميزة', 100)">
+                    <span class="emoji">⭐</span><span class="name">باقة مميزة</span><span class="price">100.00</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>📝 خدمات مجانية</h3>
+            <div class="input-group">
+                <label for="nameInput">الاسم:</label>
+                <input type="text" id="nameInput" placeholder="أدخل اسمك..." maxlength="50">
+                <span class="char-count" id="nameCount">0/50</span>
+            </div>
+            <div class="input-group">
+                <label for="msgInput">رسالة:</label>
+                <textarea id="msgInput" placeholder="اكتب رسالتك..." maxlength="200"></textarea>
+                <span class="char-count" id="msgCount">0/200</span>
+            </div>
+            <div class="buttons">
+                <button onclick="sendToBot('request_consultation')">📋 طلب استشارة مجانية</button>
+                <button onclick="sendToBot('feedback')">💬 إرسال ملاحظات</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3>📋 آخر المعاملات</h3>
+            <div class="transactions-list" id="transactionsList">
+                <p style="text-align:center;color:#999;">جاري التحميل...</p>
+            </div>
+            <button class="secondary" onclick="loadTransactions()" style="width:100%;margin-top:8px;">🔄 تحديث</button>
+        </div>
+        <button class="secondary" onclick="closeWebApp()" style="width:100%;">✖️ إغلاق</button>
+        <div id="status"></div>
+    </div>
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <h3>⚠️ تأكيد العملية</h3>
+            <p id="purchaseDetails"></p>
+            <div class="modal-buttons">
+                <button class="secondary" onclick="closeModal()">إلغاء</button>
+                <button class="success" id="confirmPurchaseBtn">تأكيد</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+        let currentUser = null;
+        let pendingPurchase = null;
+        function displayUserInfo() {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                currentUser = tg.initDataUnsafe.user;
+                document.getElementById('userNameDisplay').textContent = `👤 ${currentUser.first_name} ${currentUser.last_name || ''}`;
+                if (currentUser.first_name) document.getElementById('nameInput').value = currentUser.first_name;
+                refreshBalance();
+                loadTransactions();
+            } else {
+                document.getElementById('userNameDisplay').textContent = 'مستخدم تلغرام';
+                document.getElementById('balanceAmount').textContent = '---';
+            }
+        }
+        async function refreshBalance() {
+            if (!currentUser) return;
+            try {
+                const response = await fetch(`/api/user?user_id=${currentUser.id}`);
+                const data = await response.json();
+                if (data.success) document.getElementById('balanceAmount').textContent = data.user.balance.toFixed(2);
+            } catch (error) { console.error('خطأ:', error); }
+        }
+        async function loadTransactions() {
+            if (!currentUser) return;
+            const listEl = document.getElementById('transactionsList');
+            try {
+                const response = await fetch(`/api/transactions?user_id=${currentUser.id}&limit=5`);
+                const data = await response.json();
+                if (data.success && data.transactions.length > 0) {
+                    let html = '';
+                    data.transactions.forEach(t => {
+                        const sign = t.amount >= 0 ? '+' : '';
+                        const cssClass = t.amount >= 0 ? 'positive' : 'negative';
+                        html += `<div class="transaction-item"><div><div class="transaction-desc">${t.description}</div><small style="color:#999;">${t.created_at}</small></div><div class="transaction-amount ${cssClass}">${sign}${t.amount.toFixed(2)}</div></div>`;
+                    });
+                    listEl.innerHTML = html;
+                } else {
+                    listEl.innerHTML = '<p style="text-align:center;color:#999;">لا توجد معاملات بعد</p>';
+                }
+            } catch (error) { listEl.innerHTML = '<p style="text-align:center;color:#999;">تعذر التحميل</p>'; }
+        }
+        function purchaseService(name, price) {
+            pendingPurchase = { name, price };
+            document.getElementById('purchaseDetails').textContent = `هل تريد شراء "${name}" بقيمة ${price.toFixed(2)}؟\nسيتم خصم المبلغ من رصيدك.`;
+            document.getElementById('purchaseModal').classList.add('active');
+        }
+        function closeModal() { document.getElementById('purchaseModal').classList.remove('active'); pendingPurchase = null; }
+        document.getElementById('confirmPurchaseBtn').addEventListener('click', () => {
+            if (!pendingPurchase) return;
+            const data = { action: 'purchase', description: pendingPurchase.name, amount: pendingPurchase.price, timestamp: new Date().toISOString() };
+            try {
+                tg.sendData(JSON.stringify(data));
+                showStatus(`✅ جاري معالجة "${pendingPurchase.name}"...`, 'success');
+                setTimeout(refreshBalance, 1500);
+                setTimeout(loadTransactions, 2000);
+                closeModal();
+            } catch (error) { showStatus('❌ حدث خطأ.', 'error'); closeModal(); }
+        });
+        function sendToBot(action) {
+            const name = document.getElementById('nameInput').value.trim();
+            const message = document.getElementById('msgInput').value.trim();
+            const data = { action, name: name || null, message: message || null, timestamp: new Date().toISOString() };
+            try {
+                tg.sendData(JSON.stringify(data));
+                showStatus('✅ تم الإرسال', 'success');
+                if (window.navigator.vibrate) window.navigator.vibrate(50);
+            } catch (error) { showStatus('❌ حدث خطأ.', 'error'); }
+        }
+        function closeWebApp() { tg.close(); }
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = type;
+            setTimeout(() => { statusEl.className = ''; statusEl.textContent = ''; }, 3000);
+        }
+        document.getElementById('nameInput').addEventListener('input', function() { document.getElementById('nameCount').textContent = `${this.value.length}/50`; });
+        document.getElementById('msgInput').addEventListener('input', function() { document.getElementById('msgCount').textContent = `${this.value.length}/200`; });
+        displayUserInfo();
+    </script>
+</body>
+</html>
