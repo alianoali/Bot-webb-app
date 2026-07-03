@@ -3,265 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4F46E5">
     <title>لوحة التحكم</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --primary: #4F46E5;
+            --primary-dark: #4338CA;
             --primary-light: #818CF8;
+            --primary-bg: #EEF2FF;
             --success: #10B981;
+            --success-bg: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-bg: #FEF3C7;
             --danger: #EF4444;
+            --danger-bg: #FEE2E2;
             --bg: #F1F5F9;
             --card: #FFFFFF;
             --text: #1E293B;
-            --text-light: #64748B;
+            --text-secondary: #64748B;
+            --text-light: #94A3B8;
             --border: #E2E8F0;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+            --radius-xs: 8px;
+            --radius-sm: 12px;
             --radius: 16px;
+            --radius-lg: 20px;
+            --radius-xl: 24px;
+            --transition: 0.2s ease;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tajawal', sans-serif;
             background: var(--bg);
             color: var(--text);
+            line-height: 1.6;
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
+        /* Splash Screen */
         .splash {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            position: fixed; inset: 0;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #6366F1 100%);
             display: flex; align-items: center; justify-content: center;
-            z-index: 9999; transition: opacity 0.5s;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
         }
-        .splash.hide { opacity: 0; pointer-events: none; }
+        .splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
         .splash-content { text-align: center; color: white; }
-        .splash-logo { font-size: 64px; animation: bounce 1s infinite; }
-        .splash-title { font-size: 28px; font-weight: 700; margin-top: 16px; }
+        .splash-logo {
+            font-size: 72px;
+            animation: float 2s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .splash-title { font-size: 26px; font-weight: 800; margin-top: 16px; letter-spacing: -0.5px; }
+        .splash-subtitle { font-size: 14px; opacity: 0.8; margin-top: 4px; }
         .splash-loader {
-            width: 40px; height: 40px;
-            border: 3px solid rgba(255,255,255,0.3);
+            width: 36px; height: 36px;
+            border: 3px solid rgba(255,255,255,0.2);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin: 20px auto;
+            margin: 20px auto 0;
         }
-        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
-        @keyframes spin { to {transform:rotate(360deg)} }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);
             color: white;
-            padding: 24px 20px 40px;
-            border-radius: 0 0 30px 30px;
+            padding: 20px 16px 32px;
+            position: relative;
+            overflow: hidden;
         }
-        .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -40px;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: -30px;
+            width: 150px; height: 150px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .header-content { position: relative; z-index: 1; }
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
         .avatar {
-            width: 56px; height: 56px;
+            width: 52px; height: 52px;
             background: rgba(255,255,255,0.2);
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; font-weight: 700;
-            border: 3px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            border: 2px solid rgba(255,255,255,0.3);
+            flex-shrink: 0;
         }
-        .user-info h2 { font-size: 20px; }
-        .user-info span { font-size: 13px; opacity: 0.8; }
+        .user-info { flex: 1; min-width: 0; }
+        .user-info h2 { font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info span { font-size: 12px; opacity: 0.75; }
         .balance-card {
             background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: var(--radius);
             padding: 20px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        .balance-label { font-size: 13px; opacity: 0.8; }
-        .balance-value { font-size: 42px; font-weight: 800; }
+        .balance-label { font-size: 12px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .balance-value { font-size: 44px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+        .balance-currency { font-size: 14px; opacity: 0.7; margin-top: 4px; }
+        .level-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
 
-        .main-content { padding: 16px; margin-top: -20px; }
+        /* Main Content */
+        .main-content { padding: 0 16px; margin-top: -16px; position: relative; z-index: 2; }
 
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--card);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 8px;
+            z-index: 10;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px 8px;
+            text-align: center;
+            border-radius: var(--radius-xs);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+        }
+
+        /* Card */
         .card {
             background: var(--card);
             border-radius: var(--radius);
             padding: 20px;
             margin-bottom: 16px;
             box-shadow: var(--shadow);
+            transition: var(--transition);
         }
-        .card-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .card-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
         .stat-item {
             background: var(--bg);
-            border-radius: 10px;
-            padding: 14px;
+            border-radius: var(--radius-sm);
+            padding: 14px 12px;
             text-align: center;
             border: 1px solid var(--border);
+            transition: var(--transition);
         }
-        .stat-icon { font-size: 28px; margin-bottom: 6px; }
-        .stat-value { font-size: 22px; font-weight: 700; color: var(--primary); }
-        .stat-label { font-size: 12px; color: var(--text-light); }
+        .stat-item:active { transform: scale(0.97); }
+        .stat-icon { font-size: 24px; margin-bottom: 6px; }
+        .stat-value { font-size: 20px; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
-        .transaction-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 0; border-bottom: 1px solid var(--border);
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
-        .transaction-icon {
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; flex-shrink: 0;
-        }
-        .transaction-icon.in { background: #D1FAE5; }
-        .transaction-icon.out { background: #FEE2E2; }
-        .transaction-info { flex: 1; }
-        .transaction-info .desc { font-weight: 600; font-size: 14px; }
-        .transaction-info .date { font-size: 12px; color: var(--text-light); }
-        .transaction-amount { font-weight: 700; font-size: 15px; }
-        .transaction-amount.in { color: var(--success); }
-        .transaction-amount.out { color: var(--danger); }
-
-        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .service-item {
             background: var(--bg);
             border: 2px solid var(--border);
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             padding: 16px 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
             position: relative;
+            overflow: hidden;
         }
-        .service-item:active { transform: scale(0.95); border-color: var(--primary); }
-        .service-item.featured { border-color: var(--primary); background: #EEF2FF; }
-        .badge {
-            position: absolute; top: 8px; left: 8px;
-            background: var(--danger); color: white;
-            font-size: 10px; padding: 2px 8px;
-            border-radius: 20px; font-weight: 600;
+        .service-item:active { transform: scale(0.96); }
+        .service-item.featured {
+            border-color: var(--primary);
+            background: var(--primary-bg);
         }
-        .service-icon { font-size: 32px; display: block; margin-bottom: 8px; }
-        .service-name { font-weight: 600; font-size: 14px; }
-        .service-price { font-size: 18px; font-weight: 800; color: var(--primary); }
+        .service-badge {
+            position: absolute;
+            top: 8px; left: 8px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .service-icon { font-size: 30px; display: block; margin-bottom: 8px; }
+        .service-name { font-weight: 700; font-size: 13px; margin-bottom: 2px; }
+        .service-desc { font-size: 10px; color: var(--text-secondary); margin-bottom: 6px; }
+        .service-price { font-size: 20px; font-weight: 800; color: var(--primary); }
 
+        /* Buttons */
         .btn {
-            width: 100%; padding: 14px;
-            border: none; border-radius: 10px;
-            font-size: 15px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
             font-family: inherit;
+            text-align: center;
         }
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+        .btn-ghost { background: transparent; color: var(--text-secondary); }
+        .btn-sm { padding: 8px 14px; font-size: 13px; width: auto; border-radius: var(--radius-xs); }
 
+        /* Forms */
         .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
         .form-input {
-            width: 100%; padding: 12px 14px;
+            width: 100%;
+            padding: 12px 14px;
             border: 2px solid var(--border);
-            border-radius: 10px; font-size: 15px;
-            font-family: inherit; background: var(--bg);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: inherit;
+            background: var(--bg);
+            transition: var(--transition);
+            color: var(--text);
         }
-        textarea.form-input { min-height: 80px; resize: vertical; }
+        .form-input:focus { outline: none; border-color: var(--primary); background: white; }
+        textarea.form-input { resize: vertical; min-height: 80px; }
 
+        /* Transactions */
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .transaction-item:last-child { border-bottom: none; }
+        .tx-icon {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .tx-icon.in { background: var(--success-bg); }
+        .tx-icon.out { background: var(--danger-bg); }
+        .tx-icon.info { background: #DBEAFE; }
+        .tx-info { flex: 1; min-width: 0; }
+        .tx-desc { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tx-date { font-size: 11px; color: var(--text-light); }
+        .tx-amount { font-weight: 700; font-size: 15px; white-space: nowrap; }
+        .tx-amount.in { color: var(--success); }
+        .tx-amount.out { color: var(--danger); }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--card);
+            display: flex;
+            padding: 8px 8px 12px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            z-index: 100;
+            gap: 4px;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 4px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+        .nav-item.active { color: var(--primary); background: var(--primary-bg); }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+
+        /* Modal */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6); z-index: 1000;
-            display: flex; align-items: flex-end; justify-content: center;
-            opacity: 0; visibility: hidden; transition: all 0.3s;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0; visibility: hidden;
+            transition: 0.3s;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal {
             background: var(--card);
-            border-radius: 24px 24px 0 0;
-            padding: 24px; width: 100%;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: 24px;
+            width: 100%;
             max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
             transform: translateY(100%);
-            transition: transform 0.3s;
+            transition: 0.3s cubic-bezier(0.4,0,0.2,1);
         }
         .modal-overlay.active .modal { transform: translateY(0); }
-        .modal-handle {
-            width: 40px; height: 4px;
-            background: #CBD5E1; border-radius: 2px;
-            margin: 0 auto 20px;
-        }
-        .modal h3 { font-size: 20px; margin-bottom: 8px; }
-        .modal p { color: var(--text-light); margin-bottom: 20px; }
+        .modal-handle { width: 36px; height: 4px; background: #CBD5E1; border-radius: 2px; margin: 0 auto 20px; }
+        .modal h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .modal p { color: var(--text-secondary); margin-bottom: 20px; font-size: 14px; }
         .modal-actions { display: flex; gap: 10px; }
         .modal-actions .btn { flex: 1; }
 
-        .tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 16px; }
-        .tab {
-            flex: 1; padding: 10px; text-align: center;
-            border-radius: 8px; font-size: 13px; font-weight: 600;
-            cursor: pointer; color: var(--text-light); transition: all 0.2s;
-        }
-        .tab.active { background: white; color: var(--primary); box-shadow: var(--shadow); }
-
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--card); display: flex; padding: 8px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1); z-index: 100;
-        }
-        .nav-item {
-            flex: 1; text-align: center; padding: 8px;
-            border-radius: 12px; cursor: pointer;
-            font-size: 11px; font-weight: 600; color: var(--text-light);
-        }
-        .nav-item.active { color: var(--primary); background: #EEF2FF; }
-        .nav-item .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
-
+        /* Toast */
         .toast {
-            position: fixed; top: 20px; left: 20px; right: 20px;
-            padding: 14px; border-radius: 10px; color: white;
-            font-weight: 600; z-index: 2000;
-            transform: translateY(-120%); transition: transform 0.3s;
-            text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 16px; left: 16px; right: 16px;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 300;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-150%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
         }
         .toast.show { transform: translateY(0); }
         .toast.success { background: var(--success); }
         .toast.error { background: var(--danger); }
+        .toast.info { background: var(--primary); }
 
+        /* Empty State */
+        .empty-state { text-align: center; padding: 30px 20px; }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-text { color: var(--text-light); font-size: 14px; }
+
+        /* Utility */
         .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 12px; }
+        .mb-2 { margin-bottom: 8px; }
+        .gap-2 { gap: 8px; }
+        .flex { display: flex; }
     </style>
 </head>
 <body>
 
+    <!-- Splash Screen -->
     <div class="splash" id="splash">
         <div class="splash-content">
             <div class="splash-logo">⚡</div>
-            <div class="splash-title">جاري التحميل...</div>
+            <div class="splash-title">لوحة التحكم</div>
+            <div class="splash-subtitle">جاري تحميل بياناتك...</div>
             <div class="splash-loader"></div>
         </div>
     </div>
 
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <!-- Header -->
     <div class="header">
-        <div class="header-top">
-            <div class="avatar" id="userAvatar">👤</div>
-            <div class="user-info">
-                <h2 id="userName">المستخدم</h2>
-                <span id="userIdDisplay">@username</span>
+        <div class="header-content">
+            <div class="header-top">
+                <div class="avatar" id="userAvatar">👤</div>
+                <div class="user-info">
+                    <h2 id="userName">مستخدم تلغرام</h2>
+                    <span id="userIdDisplay">@username</span>
+                </div>
             </div>
-        </div>
-        <div class="balance-card">
-            <div class="balance-label">💰 الرصيد الحالي</div>
-            <div class="balance-value" id="balanceAmount">0.00</div>
+            <div class="balance-card">
+                <div class="balance-label">💰 الرصيد الحالي</div>
+                <div class="balance-value" id="balanceAmount">0.00</div>
+                <div class="balance-currency">نقطة</div>
+                <div class="level-badge" id="levelBadge">🌱 جديد</div>
+            </div>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
+        <!-- Tabs -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('home')">🏠 الرئيسية</div>
-            <div class="tab" onclick="switchTab('services')">🛒 الخدمات</div>
-            <div class="tab" onclick="switchTab('history')">📋 السجل</div>
+            <button class="tab active" onclick="switchTab('home')">🏠 الرئيسية</button>
+            <button class="tab" onclick="switchTab('services')">🛒 الخدمات</button>
+            <button class="tab" onclick="switchTab('history')">📋 السجل</button>
         </div>
 
+        <!-- Home Tab -->
         <div id="tab-home">
             <div class="card">
-                <div class="card-title">📊 إحصائياتي</div>
+                <div class="card-header">
+                    <div class="card-title">📊 إحصائياتي</div>
+                    <button class="btn btn-sm btn-ghost" onclick="refreshAll()">🔄</button>
+                </div>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-icon">💰</div>
@@ -274,93 +485,128 @@
                         <div class="stat-label">المشتريات</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-value" id="statDate">-</div>
-                        <div class="stat-label">تاريخ التسجيل</div>
+                        <div class="stat-icon">📥</div>
+                        <div class="stat-value" id="statEarned">0</div>
+                        <div class="stat-label">المستلم</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-icon">⭐</div>
-                        <div class="stat-value" id="statLevel">جديد</div>
-                        <div class="stat-label">المستوى</div>
+                        <div class="stat-icon">📤</div>
+                        <div class="stat-value" id="statSpent">0</div>
+                        <div class="stat-label">المنفق</div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">📋 آخر المعاملات</div>
+                <div class="card-header">
+                    <div class="card-title">📋 آخر المعاملات</div>
+                    <button class="btn btn-sm btn-ghost" onclick="switchTab('history')">عرض الكل →</button>
+                </div>
                 <div id="recentTransactions">
-                    <p style="text-align:center;color:var(--text-light);padding:20px;">لا توجد معاملات</p>
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-text">لا توجد معاملات بعد</div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Services Tab -->
         <div id="tab-services" class="hidden">
             <div class="card">
-                <div class="card-title">🛒 الخدمات المدفوعة</div>
+                <div class="card-header">
+                    <div class="card-title">🛒 الخدمات المدفوعة</div>
+                </div>
                 <div class="services-grid">
-                    <div class="service-item" onclick="purchaseService('استشارة سريعة', 10)">
+                    <div class="service-item" onclick="purchaseService('استشارة سريعة', 10, '📋')">
                         <span class="service-icon">📋</span>
                         <div class="service-name">استشارة سريعة</div>
+                        <div class="service-desc">رد خلال ساعة</div>
                         <div class="service-price">10</div>
                     </div>
-                    <div class="service-item featured" onclick="purchaseService('حجز موعد', 20)">
-                        <span class="badge">الأكثر طلباً</span>
+                    <div class="service-item featured" onclick="purchaseService('حجز موعد', 20, '📅')">
+                        <span class="service-badge">🔥 الأكثر</span>
                         <span class="service-icon">📅</span>
                         <div class="service-name">حجز موعد</div>
+                        <div class="service-desc">أولوية في الحجز</div>
                         <div class="service-price">20</div>
                     </div>
-                    <div class="service-item" onclick="purchaseService('تقرير مفصل', 50)">
+                    <div class="service-item" onclick="purchaseService('تقرير مفصل', 50, '📊')">
                         <span class="service-icon">📊</span>
                         <div class="service-name">تقرير مفصل</div>
+                        <div class="service-desc">تحليل شامل</div>
                         <div class="service-price">50</div>
                     </div>
-                    <div class="service-item featured" onclick="purchaseService('باقة مميزة', 100)">
-                        <span class="badge">الأفضل</span>
+                    <div class="service-item featured" onclick="purchaseService('باقة مميزة', 100, '⭐')">
+                        <span class="service-badge">💎 الأفضل</span>
                         <span class="service-icon">⭐</span>
                         <div class="service-name">باقة مميزة</div>
+                        <div class="service-desc">كل الخدمات</div>
                         <div class="service-price">100</div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">🎁 خدمات مجانية</div>
-                <div class="form-group">
-                    <input type="text" class="form-input" id="nameInput" placeholder="الاسم...">
+                <div class="card-header">
+                    <div class="card-title">🎁 خدمات مجانية</div>
                 </div>
                 <div class="form-group">
-                    <textarea class="form-input" id="msgInput" placeholder="رسالتك..."></textarea>
+                    <label class="form-label">👤 الاسم</label>
+                    <input type="text" class="form-input" id="nameInput" placeholder="أدخل اسمك..." maxlength="50">
                 </div>
-                <button class="btn btn-primary" onclick="sendToBot('request_consultation')">📋 طلب استشارة</button>
-                <button class="btn btn-outline" onclick="sendToBot('feedback')" style="margin-top:8px;">💬 ملاحظات</button>
+                <div class="form-group">
+                    <label class="form-label">💬 الرسالة</label>
+                    <textarea class="form-input" id="msgInput" placeholder="اكتب رسالتك هنا..." maxlength="300"></textarea>
+                </div>
+                <button class="btn btn-primary mb-2" onclick="sendToBot('request_consultation')">📋 طلب استشارة مجانية</button>
+                <button class="btn btn-outline mb-2" onclick="sendToBot('feedback')">💬 إرسال ملاحظات</button>
+                <button class="btn btn-ghost" onclick="sendToBot('support')">🎧 تواصل مع الدعم</button>
             </div>
         </div>
 
+        <!-- History Tab -->
         <div id="tab-history" class="hidden">
             <div class="card">
-                <div class="card-title">📋 سجل المعاملات</div>
+                <div class="card-header">
+                    <div class="card-title">📋 سجل المعاملات</div>
+                    <button class="btn btn-sm btn-ghost" onclick="loadTransactions()">🔄 تحديث</button>
+                </div>
                 <div id="allTransactions">
-                    <p style="text-align:center;color:var(--text-light);padding:20px;">جاري التحميل...</p>
+                    <div class="empty-state">
+                        <div class="empty-icon">⏳</div>
+                        <div class="empty-text">جاري التحميل...</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon">🏠</span> الرئيسية</div>
-        <div class="nav-item" onclick="switchTab('services')"><span class="nav-icon">🛒</span> الخدمات</div>
-        <div class="nav-item" onclick="switchTab('history')"><span class="nav-icon">📋</span> السجل</div>
-        <div class="nav-item" onclick="window.Telegram.WebApp.close()"><span class="nav-icon">✖️</span> خروج</div>
+        <button class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span> الرئيسية
+        </button>
+        <button class="nav-item" onclick="switchTab('services')">
+            <span class="nav-icon">🛒</span> الخدمات
+        </button>
+        <button class="nav-item" onclick="switchTab('history')">
+            <span class="nav-icon">📋</span> السجل
+        </button>
+        <button class="nav-item" onclick="window.Telegram.WebApp.close()">
+            <span class="nav-icon">✖️</span> خروج
+        </button>
     </div>
 
+    <!-- Purchase Modal -->
     <div class="modal-overlay" id="purchaseModal">
         <div class="modal">
             <div class="modal-handle"></div>
-            <h3>⚠️ تأكيد العملية</h3>
-            <p id="purchaseDetails"></p>
+            <h3>⚠️ تأكيد الشراء</h3>
+            <p id="purchaseDetails">هل أنت متأكد من هذه العملية؟</p>
             <div class="modal-actions">
                 <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
-                <button class="btn btn-success" id="confirmPurchaseBtn">✅ تأكيد</button>
+                <button class="btn btn-success" id="confirmPurchaseBtn">✅ تأكيد الشراء</button>
             </div>
         </div>
     </div>
@@ -372,63 +618,78 @@
 
         let currentUser = null;
         let pendingPurchase = null;
+        let currentTab = 'home';
 
-        setTimeout(() => document.getElementById('splash').classList.add('hide'), 1500);
+        setTimeout(() => document.getElementById('splash').classList.add('hide'), 1200);
 
-        if (tg.initDataUnsafe?.user) {
-            currentUser = tg.initDataUnsafe.user;
-            document.getElementById('userName').textContent = `${currentUser.first_name} ${currentUser.last_name || ''}`;
-            document.getElementById('userIdDisplay').textContent = currentUser.username ? `@${currentUser.username}` : `ID: ${currentUser.id}`;
-            document.getElementById('userAvatar').textContent = (currentUser.first_name || 'م')[0].toUpperCase();
-            if (currentUser.first_name) document.getElementById('nameInput').value = currentUser.first_name;
-            refreshBalance();
-            loadTransactions();
-            loadRecentTransactions();
+        function displayUserInfo() {
+            if (tg.initDataUnsafe?.user) {
+                currentUser = tg.initDataUnsafe.user;
+                const name = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'مستخدم';
+                const username = currentUser.username ? `@${currentUser.username}` : `🆔 ${currentUser.id}`;
+                const initial = (currentUser.first_name || 'م')[0].toUpperCase();
+
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userIdDisplay').textContent = username;
+                document.getElementById('userAvatar').textContent = initial;
+                document.getElementById('nameInput').value = currentUser.first_name || '';
+
+                refreshAll();
+            } else {
+                document.getElementById('userName').textContent = 'زائر';
+                document.getElementById('userIdDisplay').textContent = 'غير مسجل';
+            }
         }
 
         async function refreshBalance() {
             if (!currentUser) return;
             try {
-                const r = await fetch(`/api/user?user_id=${currentUser.id}`);
+                const r = await fetch(`/api/stats?user_id=${currentUser.id}`);
                 const d = await r.json();
                 if (d.success) {
-                    document.getElementById('balanceAmount').textContent = d.user.balance.toFixed(2);
-                    document.getElementById('statBalance').textContent = d.user.balance.toFixed(2);
-                    document.getElementById('statDate').textContent = d.user.created_at ? d.user.created_at.split('T')[0] : '-';
-                    let level = 'جديد';
-                    if (d.user.balance >= 1000) level = '👑 محترف';
-                    else if (d.user.balance >= 500) level = '🌟 متقدم';
-                    else if (d.user.balance >= 100) level = '💪 نشط';
-                    document.getElementById('statLevel').textContent = level;
+                    document.getElementById('balanceAmount').textContent = d.stats.balance.toFixed(2);
+                    document.getElementById('statBalance').textContent = d.stats.balance.toFixed(2);
+                    document.getElementById('statPurchases').textContent = d.stats.purchases_count;
+                    document.getElementById('statEarned').textContent = d.stats.total_earned.toFixed(2);
+                    document.getElementById('statSpent').textContent = d.stats.total_spent.toFixed(2);
+                    document.getElementById('levelBadge').textContent = `${d.stats.level.emoji} ${d.stats.level.name}`;
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error('خطأ في تحميل الإحصائيات:', e);
+            }
         }
 
         async function loadTransactions() {
             if (!currentUser) return;
             const el = document.getElementById('allTransactions');
             try {
-                const r = await fetch(`/api/transactions?user_id=${currentUser.id}&limit=20`);
+                const r = await fetch(`/api/transactions?user_id=${currentUser.id}&limit=30`);
                 const d = await r.json();
                 if (d.success && d.transactions.length > 0) {
-                    let purchaseCount = 0;
-                    let html = '';
-                    d.transactions.forEach(t => {
-                        if (t.type === 'deduct') purchaseCount++;
+                    el.innerHTML = d.transactions.map(t => {
                         const isIn = t.amount >= 0;
-                        const icon = t.type === 'add' ? '📥' : t.type === 'deduct' ? '📤' : '📝';
-                        const iconClass = t.type === 'add' ? 'in' : t.type === 'deduct' ? 'out' : 'in';
+                        const icon = t.type === 'add' || t.type === 'welcome' ? '📥' : t.type === 'deduct' ? '📤' : '📝';
+                        const iconClass = t.type === 'add' || t.type === 'welcome' ? 'in' : t.type === 'deduct' ? 'out' : 'info';
                         const sign = isIn ? '+' : '';
                         const amountClass = isIn ? 'in' : 'out';
                         const date = t.created_at ? new Date(t.created_at).toLocaleString('ar-SA') : '-';
-                        html += `<div class="transaction-item"><div class="transaction-icon ${iconClass}">${icon}</div><div class="transaction-info"><div class="desc">${t.description}</div><div class="date">${date}</div></div><div class="transaction-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div></div>`;
-                    });
-                    el.innerHTML = html;
-                    document.getElementById('statPurchases').textContent = purchaseCount;
+                        return `
+                            <div class="transaction-item">
+                                <div class="tx-icon ${iconClass}">${icon}</div>
+                                <div class="tx-info">
+                                    <div class="tx-desc">${t.description}</div>
+                                    <div class="tx-date">${date}</div>
+                                </div>
+                                <div class="tx-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div>
+                            </div>
+                        `;
+                    }).join('');
                 } else {
-                    el.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px;">لا توجد معاملات</p>';
+                    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">لا توجد معاملات</div></div>';
                 }
-            } catch(e) {}
+            } catch(e) {
+                el.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-text">تعذر التحميل</div></div>';
+            }
         }
 
         async function loadRecentTransactions() {
@@ -438,51 +699,82 @@
                 const r = await fetch(`/api/transactions?user_id=${currentUser.id}&limit=3`);
                 const d = await r.json();
                 if (d.success && d.transactions.length > 0) {
-                    let html = '';
-                    d.transactions.forEach(t => {
+                    el.innerHTML = d.transactions.map(t => {
                         const isIn = t.amount >= 0;
-                        const icon = t.type === 'add' ? '📥' : t.type === 'deduct' ? '📤' : '📝';
-                        const iconClass = t.type === 'add' ? 'in' : t.type === 'deduct' ? 'out' : 'in';
+                        const icon = t.type === 'add' || t.type === 'welcome' ? '📥' : t.type === 'deduct' ? '📤' : '📝';
+                        const iconClass = t.type === 'add' || t.type === 'welcome' ? 'in' : t.type === 'deduct' ? 'out' : 'info';
                         const sign = isIn ? '+' : '';
                         const amountClass = isIn ? 'in' : 'out';
-                        html += `<div class="transaction-item"><div class="transaction-icon ${iconClass}">${icon}</div><div class="transaction-info"><div class="desc">${t.description}</div></div><div class="transaction-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div></div>`;
-                    });
-                    el.innerHTML = html;
+                        return `
+                            <div class="transaction-item">
+                                <div class="tx-icon ${iconClass}">${icon}</div>
+                                <div class="tx-info">
+                                    <div class="tx-desc">${t.description}</div>
+                                </div>
+                                <div class="tx-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div>
+                            </div>
+                        `;
+                    }).join('');
                 }
             } catch(e) {}
         }
 
-        function purchaseService(name, price) {
-            pendingPurchase = { name, price };
-            document.getElementById('purchaseDetails').textContent = `شراء "${name}" بقيمة ${price.toFixed(2)}؟`;
+        function refreshAll() {
+            refreshBalance();
+            loadTransactions();
+            loadRecentTransactions();
+        }
+
+        function purchaseService(name, price, icon) {
+            pendingPurchase = { name, price, icon };
+            document.getElementById('purchaseDetails').innerHTML = `
+                <div style="font-size:40px;margin-bottom:12px;">${icon}</div>
+                <strong>${name}</strong><br>
+                <span style="color:var(--primary);font-size:24px;font-weight:800;">${price.toFixed(2)} نقطة</span><br>
+                <span style="font-size:13px;color:var(--text-secondary);">سيتم خصم المبلغ من رصيدك</span>
+            `;
             document.getElementById('purchaseModal').classList.add('active');
         }
 
-        function closeModal() { document.getElementById('purchaseModal').classList.remove('active'); }
+        function closeModal() {
+            document.getElementById('purchaseModal').classList.remove('active');
+            pendingPurchase = null;
+        }
 
         document.getElementById('confirmPurchaseBtn').addEventListener('click', () => {
             if (!pendingPurchase) return;
-            tg.sendData(JSON.stringify({ action: 'purchase', description: pendingPurchase.name, amount: pendingPurchase.price }));
-            showToast(`✅ تم شراء "${pendingPurchase.name}"!`, 'success');
+            tg.sendData(JSON.stringify({
+                action: 'purchase',
+                description: pendingPurchase.name,
+                amount: pendingPurchase.price
+            }));
+            showToast(`✅ تم شراء "${pendingPurchase.name}" بنجاح!`, 'success');
             closeModal();
-            setTimeout(refreshBalance, 1500);
-            setTimeout(() => { loadTransactions(); loadRecentTransactions(); }, 2000);
+            setTimeout(refreshAll, 1500);
         });
 
         function sendToBot(action) {
             const name = document.getElementById('nameInput').value.trim();
             const message = document.getElementById('msgInput').value.trim();
-            tg.sendData(JSON.stringify({ action, name: name || null, message: message || null }));
-            showToast('✅ تم الإرسال!', 'success');
+            tg.sendData(JSON.stringify({
+                action,
+                name: name || null,
+                message: message || null
+            }));
+            showToast('✅ تم الإرسال بنجاح!', 'success');
+            document.getElementById('msgInput').value = '';
         }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.querySelector(`.tab[onclick="switchTab('${tab}')"]`)?.classList.add('active');
             document.querySelector(`.nav-item[onclick="switchTab('${tab}')"]`)?.classList.add('active');
+
+            currentTab = tab;
             if (tab === 'history') loadTransactions();
             if (tab === 'home') { refreshBalance(); loadRecentTransactions(); }
         }
@@ -491,8 +783,15 @@
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = `toast ${type} show`;
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 2800);
         }
+
+        document.getElementById('purchaseModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        displayUserInfo();
     </script>
 </body>
 </html>
