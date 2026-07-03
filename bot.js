@@ -106,8 +106,8 @@ app.listen(PORT, () => {
 });
 
 // ⚠️ هذا الرابط ستغيره بعد النشر على Render
-let WEB_APP_URL = process.env.RENDER_EXTERNAL_URL || 'https://bot-webb-app-2.onrender.com';
 
+let WEB_APP_URL = process.env.RAILWAY_PUBLIC_URL || 'https://telegram-bot.up.railway.app';
 // ============================================
 // أمر /start
 // ============================================
