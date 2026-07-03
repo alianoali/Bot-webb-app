@@ -1,8 +1,6 @@
 {
-  "name": "telegram-webapp-bot",
+  "name": "telegram-bot",
   "version": "1.0.0",
-  "description": "بوت تلغرام مع تطبيق ويب",
-  "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
   },
