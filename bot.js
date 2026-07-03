@@ -6,11 +6,30 @@ const fs = require('fs');
 const TOKEN = '8746894087:AAHmdTT-2GMK0YnAcHLymSrUow5nKGukd3Q';
 const ADMIN_IDS = [6183869749];
 
-const bot = new TelegramBot(TOKEN, { polling: true });
 const app = express();
-
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ============================================
+// رابط Railway - سيتم تحديثه تلقائياً
+// ============================================
+const RAILWAY_URL = process.env.RAILWAY_PUBLIC_URL || 'https://your-app.up.railway.app';
+
+// ============================================
+// إعداد البوت مع Webhook
+// ============================================
+const bot = new TelegramBot(TOKEN);
+
+// تعيين Webhook
+bot.setWebHook(`${RAILWAY_URL}/webhook`)
+    .then(() => console.log('✅ Webhook تم تعيينه بنجاح'))
+    .catch(err => console.error('❌ خطأ في Webhook:', err));
+
+// استقبال التحديثات من تلغرام
+app.post('/webhook', (req, res) => {
+    bot.processUpdate(req.body);
+    res.sendStatus(200);
+});
 
 // ============================================
 // قاعدة البيانات
@@ -87,20 +106,26 @@ app.get('/api/transactions', (req, res) => {
 });
 
 // ============================================
-// الصفحة الرئيسية - تعرض تطبيق الويب مباشرة
+// الصفحة الرئيسية
 // ============================================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // ============================================
-// تشغيل الخادم
+// صفحة فحص البوت
 // ============================================
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ يعمل على ${PORT}`));
-
-// Railway يعطي الرابط تلقائياً
-let WEB_APP_URL = process.env.RAILWAY_PUBLIC_URL || '';
+app.get('/status', (req, res) => {
+    bot.getWebHookInfo().then(info => {
+        res.json({
+            status: 'online',
+            webhook: info,
+            railway_url: RAILWAY_URL
+        });
+    }).catch(err => {
+        res.json({ status: 'error', error: err.message });
+    });
+});
 
 // ============================================
 // أمر /start
@@ -112,7 +137,7 @@ bot.onText(/\/start/, (msg) => {
     const options = {
         reply_markup: {
             inline_keyboard: [
-                [{ text: '🚀 افتح التطبيق', web_app: { url: WEB_APP_URL } }],
+                [{ text: '🚀 افتح التطبيق', web_app: { url: RAILWAY_URL } }],
                 [
                     { text: '💰 رصيدي', callback_data: 'balance' },
                     { text: '📋 كشف الحساب', callback_data: 'history' }
@@ -125,7 +150,16 @@ bot.onText(/\/start/, (msg) => {
 });
 
 // ============================================
-// أوامر المشرف
+// أمر /balance
+// ============================================
+bot.onText(/\/balance/, (msg) => {
+    const db = readDB();
+    const user = db.users[msg.from.id];
+    bot.sendMessage(msg.chat.id, `💰 رصيدك: ${user ? user.balance.toFixed(2) : '0.00'}`);
+});
+
+// ============================================
+// أمر /addbalance
 // ============================================
 bot.onText(/\/addbalance (.+)/, (msg, match) => {
     if (!ADMIN_IDS.includes(msg.from.id)) return bot.sendMessage(msg.chat.id, '❌ للمشرف فقط');
@@ -134,20 +168,22 @@ bot.onText(/\/addbalance (.+)/, (msg, match) => {
     bot.sendMessage(msg.chat.id, result.success ? `✅ تم. الرصيد: ${result.balance}` : result.message);
 });
 
+// ============================================
+// أمر /users
+// ============================================
 bot.onText(/\/users/, (msg) => {
     if (!ADMIN_IDS.includes(msg.from.id)) return bot.sendMessage(msg.chat.id, '❌ للمشرف فقط');
     const db = readDB();
     bot.sendMessage(msg.chat.id, `👥 المستخدمين: ${Object.keys(db.users).length}`);
 });
 
-bot.onText(/\/broadcast (.+)/, (msg, match) => {
-    if (!ADMIN_IDS.includes(msg.from.id)) return bot.sendMessage(msg.chat.id, '❌ للمشرف فقط');
-    const db = readDB();
-    let count = 0;
-    Object.keys(db.users).forEach(uid => {
-        bot.sendMessage(uid, `📢 ${match[1]}`).then(() => count++).catch(() => {});
+// ============================================
+// أمر /checkwebhook
+// ============================================
+bot.onText(/\/checkwebhook/, (msg) => {
+    bot.getWebHookInfo().then(info => {
+        bot.sendMessage(msg.chat.id, `✅ Webhook:\nURL: ${info.url}\nStatus: ${info.last_error_message || 'OK'}`);
     });
-    setTimeout(() => bot.sendMessage(msg.chat.id, `✅ أرسل لـ ${count}`), 2000);
 });
 
 // ============================================
@@ -184,4 +220,12 @@ bot.on('web_app_data', (msg) => {
     }
 });
 
-console.log('🚀 جاهز');
+// ============================================
+// تشغيل الخادم
+// ============================================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`✅ الخادم يعمل على ${PORT}`);
+    console.log(`✅ الرابط: ${RAILWAY_URL}`);
+    console.log(`✅ Webhook: ${RAILWAY_URL}/webhook`);
+});
