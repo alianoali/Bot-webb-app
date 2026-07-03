@@ -10,101 +10,63 @@
             --primary: #4F46E5;
             --primary-light: #818CF8;
             --success: #10B981;
-            --warning: #F59E0B;
             --danger: #EF4444;
             --bg: #F1F5F9;
             --card: #FFFFFF;
             --text: #1E293B;
             --text-light: #64748B;
             --border: #E2E8F0;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             --radius: 16px;
-            --radius-sm: 10px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tajawal', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
             min-height: 100vh;
             padding-bottom: 80px;
         }
 
-        /* الشاشة الترحيبية */
         .splash {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(135deg, #4F46E5, #7C3AED);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s, visibility 0.5s;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.5s;
         }
-        .splash.hide { opacity: 0; visibility: hidden; }
+        .splash.hide { opacity: 0; pointer-events: none; }
         .splash-content { text-align: center; color: white; }
         .splash-logo { font-size: 64px; animation: bounce 1s infinite; }
         .splash-title { font-size: 28px; font-weight: 700; margin-top: 16px; }
-        .splash-loader { 
-            width: 40px; height: 40px; 
-            border: 3px solid rgba(255,255,255,0.3); 
-            border-top-color: white; 
-            border-radius: 50%; 
+        .splash-loader {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin: 20px auto;
         }
         @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
         @keyframes spin { to {transform:rotate(360deg)} }
 
-        /* الهيدر */
         .header {
             background: linear-gradient(135deg, #4F46E5, #7C3AED);
             color: white;
             padding: 24px 20px 40px;
             border-radius: 0 0 30px 30px;
-            position: relative;
-            overflow: hidden;
         }
-        .header::after {
-            content: '';
-            position: absolute;
-            top: -50px; right: -50px;
-            width: 150px; height: 150px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-        }
-        .header::before {
-            content: '';
-            position: absolute;
-            bottom: -30px; left: -30px;
-            width: 100px; height: 100px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 50%;
-        }
-        .header-top {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
+        .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .avatar {
             width: 56px; height: 56px;
             background: rgba(255,255,255,0.2);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 700;
             border: 3px solid rgba(255,255,255,0.3);
         }
-        .user-info h2 { font-size: 20px; font-weight: 700; }
+        .user-info h2 { font-size: 20px; }
         .user-info span { font-size: 13px; opacity: 0.8; }
         .balance-card {
             background: rgba(255,255,255,0.15);
@@ -112,51 +74,26 @@
             border-radius: var(--radius);
             padding: 20px;
             text-align: center;
-            position: relative;
-            z-index: 1;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        .balance-label { font-size: 13px; opacity: 0.8; margin-bottom: 4px; }
-        .balance-value { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
-        .balance-currency { font-size: 16px; opacity: 0.8; }
+        .balance-label { font-size: 13px; opacity: 0.8; }
+        .balance-value { font-size: 42px; font-weight: 800; }
 
-        /* المحتوى الرئيسي */
-        .main-content { padding: 16px; margin-top: -20px; position: relative; z-index: 2; }
+        .main-content { padding: 16px; margin-top: -20px; }
 
-        /* الكروت */
         .card {
             background: var(--card);
             border-radius: var(--radius);
             padding: 20px;
             margin-bottom: 16px;
             box-shadow: var(--shadow);
-            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .card:active { transform: scale(0.98); }
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-        .card-title {
-            font-size: 17px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .card-title .icon { font-size: 22px; }
+        .card-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
 
-        /* الإحصائيات */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .stat-item {
             background: var(--bg);
-            border-radius: var(--radius-sm);
+            border-radius: 10px;
             padding: 14px;
             text-align: center;
             border: 1px solid var(--border);
@@ -165,28 +102,18 @@
         .stat-value { font-size: 22px; font-weight: 700; color: var(--primary); }
         .stat-label { font-size: 12px; color: var(--text-light); }
 
-        /* جدول المعاملات */
         .transaction-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 0; border-bottom: 1px solid var(--border);
         }
-        .transaction-item:last-child { border-bottom: none; }
         .transaction-icon {
             width: 44px; height: 44px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
         }
         .transaction-icon.in { background: #D1FAE5; }
         .transaction-icon.out { background: #FEE2E2; }
-        .transaction-icon.info { background: #DBEAFE; }
         .transaction-info { flex: 1; }
         .transaction-info .desc { font-weight: 600; font-size: 14px; }
         .transaction-info .date { font-size: 12px; color: var(--text-light); }
@@ -194,189 +121,113 @@
         .transaction-amount.in { color: var(--success); }
         .transaction-amount.out { color: var(--danger); }
 
-        /* شبكة الخدمات */
-        .services-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .service-item {
             background: var(--bg);
             border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 10px;
             padding: 16px 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
-            overflow: hidden;
         }
         .service-item:active { transform: scale(0.95); border-color: var(--primary); }
         .service-item.featured { border-color: var(--primary); background: #EEF2FF; }
-        .service-item .badge {
-            position: absolute;
-            top: 8px; left: 8px;
-            background: var(--danger);
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: 600;
+        .badge {
+            position: absolute; top: 8px; left: 8px;
+            background: var(--danger); color: white;
+            font-size: 10px; padding: 2px 8px;
+            border-radius: 20px; font-weight: 600;
         }
         .service-icon { font-size: 32px; display: block; margin-bottom: 8px; }
-        .service-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .service-name { font-weight: 600; font-size: 14px; }
         .service-price { font-size: 18px; font-weight: 800; color: var(--primary); }
-        .service-desc { font-size: 11px; color: var(--text-light); }
 
-        /* أزرار */
         .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+            width: 100%; padding: 14px;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
             font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; border-radius: 8px; }
 
-        /* الفورم */
         .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-light); }
         .form-input {
-            width: 100%;
-            padding: 12px 14px;
+            width: 100%; padding: 12px 14px;
             border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            font-family: inherit;
-            background: var(--bg);
-            transition: border-color 0.2s;
+            border-radius: 10px; font-size: 15px;
+            font-family: inherit; background: var(--bg);
         }
-        .form-input:focus { outline: none; border-color: var(--primary); }
-        textarea.form-input { resize: vertical; min-height: 80px; }
+        textarea.form-input { min-height: 80px; resize: vertical; }
 
-        /* المودال */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 1000;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 1000;
+            display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal {
             background: var(--card);
             border-radius: 24px 24px 0 0;
-            padding: 24px;
-            width: 100%;
+            padding: 24px; width: 100%;
             max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
             transform: translateY(100%);
             transition: transform 0.3s;
         }
         .modal-overlay.active .modal { transform: translateY(0); }
         .modal-handle {
             width: 40px; height: 4px;
-            background: #CBD5E1;
-            border-radius: 2px;
+            background: #CBD5E1; border-radius: 2px;
             margin: 0 auto 20px;
         }
-        .modal h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .modal h3 { font-size: 20px; margin-bottom: 8px; }
         .modal p { color: var(--text-light); margin-bottom: 20px; }
         .modal-actions { display: flex; gap: 10px; }
         .modal-actions .btn { flex: 1; }
 
-        /* التبويبات */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--bg);
-            border-radius: var(--radius-sm);
-            padding: 4px;
-            margin-bottom: 16px;
-        }
+        .tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 16px; }
         .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-light);
+            flex: 1; padding: 10px; text-align: center;
+            border-radius: 8px; font-size: 13px; font-weight: 600;
+            cursor: pointer; color: var(--text-light); transition: all 0.2s;
         }
         .tab.active { background: white; color: var(--primary); box-shadow: var(--shadow); }
 
-        /* قائمة التنقل السفلية */
         .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--card);
-            display: flex;
-            padding: 8px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-            z-index: 100;
-            gap: 4px;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card); display: flex; padding: 8px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1); z-index: 100;
         }
         .nav-item {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-light);
+            flex: 1; text-align: center; padding: 8px;
+            border-radius: 12px; cursor: pointer;
+            font-size: 11px; font-weight: 600; color: var(--text-light);
         }
         .nav-item.active { color: var(--primary); background: #EEF2FF; }
         .nav-item .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
 
-        /* إشعار */
         .toast {
-            position: fixed;
-            top: 20px; left: 20px; right: 20px;
-            padding: 14px 20px;
-            border-radius: var(--radius-sm);
-            color: white;
-            font-weight: 600;
-            z-index: 2000;
-            transform: translateY(-120%);
-            transition: transform 0.3s;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
+            position: fixed; top: 20px; left: 20px; right: 20px;
+            padding: 14px; border-radius: 10px; color: white;
+            font-weight: 600; z-index: 2000;
+            transform: translateY(-120%); transition: transform 0.3s;
+            text-align: center; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
         }
         .toast.show { transform: translateY(0); }
         .toast.success { background: var(--success); }
         .toast.error { background: var(--danger); }
-        .toast.info { background: var(--primary); }
 
-        /* مخفي */
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- الشاشة الترحيبية -->
     <div class="splash" id="splash">
         <div class="splash-content">
             <div class="splash-logo">⚡</div>
@@ -385,10 +236,8 @@
         </div>
     </div>
 
-    <!-- إشعار -->
     <div class="toast" id="toast"></div>
 
-    <!-- الهيدر -->
     <div class="header">
         <div class="header-top">
             <div class="avatar" id="userAvatar">👤</div>
@@ -400,27 +249,19 @@
         <div class="balance-card">
             <div class="balance-label">💰 الرصيد الحالي</div>
             <div class="balance-value" id="balanceAmount">0.00</div>
-            <div class="balance-currency">نقطة</div>
         </div>
     </div>
 
-    <!-- المحتوى الرئيسي -->
     <div class="main-content">
-
-        <!-- التبويبات -->
         <div class="tabs">
             <div class="tab active" onclick="switchTab('home')">🏠 الرئيسية</div>
             <div class="tab" onclick="switchTab('services')">🛒 الخدمات</div>
             <div class="tab" onclick="switchTab('history')">📋 السجل</div>
         </div>
 
-        <!-- تبويب الرئيسية -->
         <div id="tab-home">
-            <!-- الإحصائيات -->
             <div class="card">
-                <div class="card-header">
-                    <div class="card-title"><span class="icon">📊</span> إحصائياتي</div>
-                </div>
+                <div class="card-title">📊 إحصائياتي</div>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-icon">💰</div>
@@ -445,109 +286,78 @@
                 </div>
             </div>
 
-            <!-- آخر المعاملات -->
             <div class="card">
-                <div class="card-header">
-                    <div class="card-title"><span class="icon">📋</span> آخر المعاملات</div>
-                    <button class="btn btn-sm btn-outline" onclick="switchTab('history')">عرض الكل</button>
-                </div>
+                <div class="card-title">📋 آخر المعاملات</div>
                 <div id="recentTransactions">
-                    <p style="text-align:center;color:var(--text-light);padding:20px;">لا توجد معاملات بعد</p>
+                    <p style="text-align:center;color:var(--text-light);padding:20px;">لا توجد معاملات</p>
                 </div>
             </div>
         </div>
 
-        <!-- تبويب الخدمات -->
         <div id="tab-services" class="hidden">
             <div class="card">
-                <div class="card-header">
-                    <div class="card-title"><span class="icon">🛒</span> الخدمات المدفوعة</div>
-                </div>
+                <div class="card-title">🛒 الخدمات المدفوعة</div>
                 <div class="services-grid">
-                    <div class="service-item" onclick="purchaseService('استشارة سريعة', 10, '📋')">
+                    <div class="service-item" onclick="purchaseService('استشارة سريعة', 10)">
                         <span class="service-icon">📋</span>
                         <div class="service-name">استشارة سريعة</div>
-                        <div class="service-desc">رد خلال ساعة</div>
                         <div class="service-price">10</div>
                     </div>
-                    <div class="service-item featured" onclick="purchaseService('حجز موعد', 20, '📅')">
+                    <div class="service-item featured" onclick="purchaseService('حجز موعد', 20)">
                         <span class="badge">الأكثر طلباً</span>
                         <span class="service-icon">📅</span>
                         <div class="service-name">حجز موعد</div>
-                        <div class="service-desc">أولوية في الحجز</div>
                         <div class="service-price">20</div>
                     </div>
-                    <div class="service-item" onclick="purchaseService('تقرير مفصل', 50, '📊')">
+                    <div class="service-item" onclick="purchaseService('تقرير مفصل', 50)">
                         <span class="service-icon">📊</span>
                         <div class="service-name">تقرير مفصل</div>
-                        <div class="service-desc">تحليل شامل</div>
                         <div class="service-price">50</div>
                     </div>
-                    <div class="service-item featured" onclick="purchaseService('باقة مميزة', 100, '⭐')">
+                    <div class="service-item featured" onclick="purchaseService('باقة مميزة', 100)">
                         <span class="badge">الأفضل</span>
                         <span class="service-icon">⭐</span>
                         <div class="service-name">باقة مميزة</div>
-                        <div class="service-desc">كل الخدمات</div>
                         <div class="service-price">100</div>
                     </div>
                 </div>
             </div>
 
-            <!-- خدمات مجانية -->
             <div class="card">
-                <div class="card-header">
-                    <div class="card-title"><span class="icon">🎁</span> خدمات مجانية</div>
+                <div class="card-title">🎁 خدمات مجانية</div>
+                <div class="form-group">
+                    <input type="text" class="form-input" id="nameInput" placeholder="الاسم...">
                 </div>
                 <div class="form-group">
-                    <label>الاسم</label>
-                    <input type="text" class="form-input" id="nameInput" placeholder="أدخل اسمك...">
+                    <textarea class="form-input" id="msgInput" placeholder="رسالتك..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label>الرسالة</label>
-                    <textarea class="form-input" id="msgInput" placeholder="اكتب رسالتك هنا..."></textarea>
-                </div>
-                <button class="btn btn-primary" onclick="sendToBot('request_consultation')">📋 طلب استشارة مجانية</button>
-                <button class="btn btn-outline" onclick="sendToBot('feedback')" style="margin-top:8px;">💬 إرسال ملاحظات</button>
+                <button class="btn btn-primary" onclick="sendToBot('request_consultation')">📋 طلب استشارة</button>
+                <button class="btn btn-outline" onclick="sendToBot('feedback')" style="margin-top:8px;">💬 ملاحظات</button>
             </div>
         </div>
 
-        <!-- تبويب السجل -->
         <div id="tab-history" class="hidden">
             <div class="card">
-                <div class="card-header">
-                    <div class="card-title"><span class="icon">📋</span> سجل المعاملات</div>
-                    <button class="btn btn-sm btn-outline" onclick="loadTransactions()">🔄 تحديث</button>
-                </div>
+                <div class="card-title">📋 سجل المعاملات</div>
                 <div id="allTransactions">
                     <p style="text-align:center;color:var(--text-light);padding:20px;">جاري التحميل...</p>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- قائمة التنقل -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home')">
-            <span class="nav-icon">🏠</span> الرئيسية
-        </div>
-        <div class="nav-item" onclick="switchTab('services')">
-            <span class="nav-icon">🛒</span> الخدمات
-        </div>
-        <div class="nav-item" onclick="switchTab('history')">
-            <span class="nav-icon">📋</span> السجل
-        </div>
-        <div class="nav-item" onclick="tg.close()">
-            <span class="nav-icon">✖️</span> خروج
-        </div>
+        <div class="nav-item active" onclick="switchTab('home')"><span class="nav-icon">🏠</span> الرئيسية</div>
+        <div class="nav-item" onclick="switchTab('services')"><span class="nav-icon">🛒</span> الخدمات</div>
+        <div class="nav-item" onclick="switchTab('history')"><span class="nav-icon">📋</span> السجل</div>
+        <div class="nav-item" onclick="window.Telegram.WebApp.close()"><span class="nav-icon">✖️</span> خروج</div>
     </div>
 
-    <!-- مودال تأكيد الشراء -->
     <div class="modal-overlay" id="purchaseModal">
         <div class="modal">
             <div class="modal-handle"></div>
             <h3>⚠️ تأكيد العملية</h3>
-            <p id="purchaseDetails">هل أنت متأكد من هذه العملية؟</p>
+            <p id="purchaseDetails"></p>
             <div class="modal-actions">
                 <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
                 <button class="btn btn-success" id="confirmPurchaseBtn">✅ تأكيد</button>
@@ -562,33 +372,20 @@
 
         let currentUser = null;
         let pendingPurchase = null;
-        let currentTab = 'home';
 
-        // إخفاء الشاشة الترحيبية
-        setTimeout(() => {
-            document.getElementById('splash').classList.add('hide');
-        }, 1500);
+        setTimeout(() => document.getElementById('splash').classList.add('hide'), 1500);
 
-        // عرض معلومات المستخدم
-        function displayUserInfo() {
-            if (tg.initDataUnsafe?.user) {
-                currentUser = tg.initDataUnsafe.user;
-                const name = `${currentUser.first_name} ${currentUser.last_name || ''}`;
-                const username = currentUser.username ? `@${currentUser.username}` : `ID: ${currentUser.id}`;
-                const initial = (currentUser.first_name || 'م')[0].toUpperCase();
-
-                document.getElementById('userName').textContent = name;
-                document.getElementById('userIdDisplay').textContent = username;
-                document.getElementById('userAvatar').textContent = initial;
-                if (currentUser.first_name) document.getElementById('nameInput').value = currentUser.first_name;
-
-                refreshBalance();
-                loadTransactions();
-                loadRecentTransactions();
-            }
+        if (tg.initDataUnsafe?.user) {
+            currentUser = tg.initDataUnsafe.user;
+            document.getElementById('userName').textContent = `${currentUser.first_name} ${currentUser.last_name || ''}`;
+            document.getElementById('userIdDisplay').textContent = currentUser.username ? `@${currentUser.username}` : `ID: ${currentUser.id}`;
+            document.getElementById('userAvatar').textContent = (currentUser.first_name || 'م')[0].toUpperCase();
+            if (currentUser.first_name) document.getElementById('nameInput').value = currentUser.first_name;
+            refreshBalance();
+            loadTransactions();
+            loadRecentTransactions();
         }
 
-        // تحديث الرصيد
         async function refreshBalance() {
             if (!currentUser) return;
             try {
@@ -598,8 +395,6 @@
                     document.getElementById('balanceAmount').textContent = d.user.balance.toFixed(2);
                     document.getElementById('statBalance').textContent = d.user.balance.toFixed(2);
                     document.getElementById('statDate').textContent = d.user.created_at ? d.user.created_at.split('T')[0] : '-';
-
-                    // تحديد المستوى
                     let level = 'جديد';
                     if (d.user.balance >= 1000) level = '👑 محترف';
                     else if (d.user.balance >= 500) level = '🌟 متقدم';
@@ -609,7 +404,6 @@
             } catch(e) {}
         }
 
-        // تحميل المعاملات
         async function loadTransactions() {
             if (!currentUser) return;
             const el = document.getElementById('allTransactions');
@@ -623,32 +417,20 @@
                         if (t.type === 'deduct') purchaseCount++;
                         const isIn = t.amount >= 0;
                         const icon = t.type === 'add' ? '📥' : t.type === 'deduct' ? '📤' : '📝';
-                        const iconClass = t.type === 'add' ? 'in' : t.type === 'deduct' ? 'out' : 'info';
+                        const iconClass = t.type === 'add' ? 'in' : t.type === 'deduct' ? 'out' : 'in';
                         const sign = isIn ? '+' : '';
                         const amountClass = isIn ? 'in' : 'out';
                         const date = t.created_at ? new Date(t.created_at).toLocaleString('ar-SA') : '-';
-                        html += `
-                            <div class="transaction-item">
-                                <div class="transaction-icon ${iconClass}">${icon}</div>
-                                <div class="transaction-info">
-                                    <div class="desc">${t.description}</div>
-                                    <div class="date">${date}</div>
-                                </div>
-                                <div class="transaction-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div>
-                            </div>
-                        `;
+                        html += `<div class="transaction-item"><div class="transaction-icon ${iconClass}">${icon}</div><div class="transaction-info"><div class="desc">${t.description}</div><div class="date">${date}</div></div><div class="transaction-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div></div>`;
                     });
                     el.innerHTML = html;
                     document.getElementById('statPurchases').textContent = purchaseCount;
                 } else {
                     el.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px;">لا توجد معاملات</p>';
                 }
-            } catch(e) {
-                el.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px;">تعذر التحميل</p>';
-            }
+            } catch(e) {}
         }
 
-        // آخر المعاملات (للرئيسية)
         async function loadRecentTransactions() {
             if (!currentUser) return;
             const el = document.getElementById('recentTransactions');
@@ -660,91 +442,57 @@
                     d.transactions.forEach(t => {
                         const isIn = t.amount >= 0;
                         const icon = t.type === 'add' ? '📥' : t.type === 'deduct' ? '📤' : '📝';
-                        const iconClass = t.type === 'add' ? 'in' : t.type === 'deduct' ? 'out' : 'info';
+                        const iconClass = t.type === 'add' ? 'in' : t.type === 'deduct' ? 'out' : 'in';
                         const sign = isIn ? '+' : '';
                         const amountClass = isIn ? 'in' : 'out';
-                        html += `
-                            <div class="transaction-item">
-                                <div class="transaction-icon ${iconClass}">${icon}</div>
-                                <div class="transaction-info">
-                                    <div class="desc">${t.description}</div>
-                                </div>
-                                <div class="transaction-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div>
-                            </div>
-                        `;
+                        html += `<div class="transaction-item"><div class="transaction-icon ${iconClass}">${icon}</div><div class="transaction-info"><div class="desc">${t.description}</div></div><div class="transaction-amount ${amountClass}">${sign}${t.amount.toFixed(2)}</div></div>`;
                     });
                     el.innerHTML = html;
                 }
             } catch(e) {}
         }
 
-        // شراء خدمة
-        function purchaseService(name, price, icon) {
-            pendingPurchase = { name, price, icon };
-            document.getElementById('purchaseDetails').textContent = `هل تريد شراء "${icon} ${name}" بقيمة ${price.toFixed(2)} نقطة؟\nسيتم خصم المبلغ من رصيدك.`;
+        function purchaseService(name, price) {
+            pendingPurchase = { name, price };
+            document.getElementById('purchaseDetails').textContent = `شراء "${name}" بقيمة ${price.toFixed(2)}؟`;
             document.getElementById('purchaseModal').classList.add('active');
         }
 
-        function closeModal() {
-            document.getElementById('purchaseModal').classList.remove('active');
-            pendingPurchase = null;
-        }
+        function closeModal() { document.getElementById('purchaseModal').classList.remove('active'); }
 
         document.getElementById('confirmPurchaseBtn').addEventListener('click', () => {
             if (!pendingPurchase) return;
-            tg.sendData(JSON.stringify({
-                action: 'purchase',
-                description: pendingPurchase.name,
-                amount: pendingPurchase.price
-            }));
-            showToast(`✅ تم شراء "${pendingPurchase.name}" بنجاح!`, 'success');
+            tg.sendData(JSON.stringify({ action: 'purchase', description: pendingPurchase.name, amount: pendingPurchase.price }));
+            showToast(`✅ تم شراء "${pendingPurchase.name}"!`, 'success');
             closeModal();
             setTimeout(refreshBalance, 1500);
             setTimeout(() => { loadTransactions(); loadRecentTransactions(); }, 2000);
         });
 
-        // إرسال للبوت
         function sendToBot(action) {
             const name = document.getElementById('nameInput').value.trim();
             const message = document.getElementById('msgInput').value.trim();
             tg.sendData(JSON.stringify({ action, name: name || null, message: message || null }));
-            showToast('✅ تم الإرسال بنجاح!', 'success');
+            showToast('✅ تم الإرسال!', 'success');
         }
 
-        // تبديل التبويبات
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
-
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.querySelector(`.tab[onclick="switchTab('${tab}')"]`)?.classList.add('active');
             document.querySelector(`.nav-item[onclick="switchTab('${tab}')"]`)?.classList.add('active');
-
-            currentTab = tab;
             if (tab === 'history') loadTransactions();
             if (tab === 'home') { refreshBalance(); loadRecentTransactions(); }
         }
 
-        // إشعار
         function showToast(message, type) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = `toast ${type} show`;
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        // الإغلاق بالسحب للأسفل
-        let touchStart = 0;
-        document.addEventListener('touchstart', e => { touchStart = e.touches[0].clientY; });
-        document.addEventListener('touchend', e => {
-            if (e.changedTouches[0].clientY - touchStart > 150 && window.scrollY === 0) {
-                tg.close();
-            }
-        });
-
-        // بدء التطبيق
-        displayUserInfo();
     </script>
 </body>
 </html>
